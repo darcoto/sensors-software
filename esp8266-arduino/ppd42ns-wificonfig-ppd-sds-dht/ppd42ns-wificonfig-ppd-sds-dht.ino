@@ -89,7 +89,11 @@
 #include <TinyGPS++.h>
 #include <Ticker.h>
 
-#include "intl.h"
+#if defined(INTL_BG)
+#include "intl_bg.h"
+#else
+#include "intl_de.h"
+#endif
 #include "ext_def.h"
 #include "html-content.h"
 
