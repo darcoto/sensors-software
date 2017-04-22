@@ -1,3 +1,17 @@
+#define D0 0
+#define D1 1
+#define D2 2
+#define D3 3
+#define D4 4
+#define D5 5
+#define D6 6
+#define D7 7
+#define D8 8
+#define D9 9
+#define D10 10
+#define D11 11
+#define D12 12
+
 // WLAN Konfig
 #define WLANSSID "Freifunk-disabled"
 #define WLANPWD ""
@@ -112,19 +126,7 @@
 // Required for Serial on Zero based boards
 #define Serial SERIAL_PORT_USBVIRTUAL
 //GPIO Pins
-#define D0 0
-#define D1 1
-#define D2 2
-#define D3 3
-#define D4 4
-#define D5 5
-#define D6 6
-#define D7 7
-#define D8 8
-#define D9 9
-#define D10 10
-#define D11 11
-#define D12 12
+
 // LoRa module
 #define RFM69_CS 8
 #define RFM69_RST 4

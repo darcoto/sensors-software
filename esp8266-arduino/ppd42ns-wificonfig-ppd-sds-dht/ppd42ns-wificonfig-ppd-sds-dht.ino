@@ -89,6 +89,7 @@
 #include <TinyGPS++.h>
 #include <Ticker.h>
 
+#include "intl.h"
 #include "ext_def.h"
 #include "html-content.h"
 
@@ -751,6 +752,18 @@ String form_checkbox(const String& name, const String& info, const bool checked)
 	return s;
 }
 
+String form_submit(const String& value) {
+	String s = F("<tr><td>&nbsp;</td><td><input type='submit' name='submit' value='{v}' /></td></tr>");
+	s.replace("{v}",value);
+	return s;
+}
+
+String _intl(const String& patt, const String& value) {
+	String s = F("{p}");
+	s.replace("{s}",patt);s.replace("{s}",value);
+	return s;
+}
+
 String table_row_from_value(const String& name, const String& value) {
 	String s = F("<tr><td>{n}</td><td style='width:80%;'>{v}</td></tr>");
 	s.replace("{n}",name);s.replace("{v}",value);
@@ -822,7 +835,9 @@ void webserver_config() {
 	page_content += FPSTR(WEB_CONFIG_SCRIPT);
 	if (server.method() == HTTP_GET) {
 		page_content += F("<form method='POST' action='/config' style='width: 100%;'>");
-		page_content += F("<b>WLAN Daten</b><br/>");
+		page_content += F("<b>");
+		page_content += FPSTR(INTL_WLAN_DATEN);
+		page_content += F("</b><br/>");
 		if (WiFi.status() != WL_CONNECTED) {  // scan for wlan ssids
 			WiFi.disconnect();
 			debug_out(F("scan for wifi networks..."),DEBUG_MIN_INFO,1);
@@ -830,9 +845,12 @@ void webserver_config() {
 			debug_out(F("wifi networks found: "),DEBUG_MIN_INFO,0);
 			debug_out(String(n),DEBUG_MIN_INFO,1);
 			if (n == 0) {
-				page_content += F("<br/>Keine Netzwerke gefunden<br/>");
+				page_content += F("<br/>");
+				page_content += FPSTR(INTL_KEINE_NETZWERKE);
+				page_content += F("<br/>");
 			} else {
-				page_content += F("<br/>Netzwerke gefunden: ");
+				page_content += F("<br/>");
+				page_content += FPSTR(INTL_NETZWERKE_GEFUNDEN);
 				page_content += String(n);
 				page_content += F("<br/>");
 				int indices[n];
@@ -866,15 +884,25 @@ void webserver_config() {
 		page_content += F("<table>");
 		page_content += form_input(F("wlanssid"),F("WLAN"),wlanssid,64);
 		page_content += form_password(F("wlanpwd"),F("Passwort"),wlanpwd,64);
-		page_content += F("</table><br/><input type='submit' name='submit' value='Speichern'/><br/><br/><b>Ab hier nur ändern, wenn Sie wirklich wissen, was Sie tun!!!</b><br/><br/><b>BasicAuth</b><br/>");
+		page_content += form_submit(INTL_SPEICHERN);
+		page_content += FPSTR("</table><br/><br/><br/><b>");
+		page_content += FPSTR(INTL_AB_HIER_NUR_ANDERN);
+		page_content += F("</b><br/><br/><b>");
+		page_content += FPSTR(INTL_BASICAUTH);
+		page_content += F("</b><br/>");
+		
 		page_content += F("<table>");
 		page_content += form_input(F("www_username"),F("User"),www_username,64);
 		page_content += form_password(F("www_password"),F("Passwort"),www_password,64);
 		page_content += form_checkbox(F("www_basicauth_enabled"),F("BasicAuth aktivieren"),www_basicauth_enabled);
-		page_content += F("</table><br/><input type='submit' name='submit' value='Speichern'/><br/><br/><b>APIs</b><br/>");
+		page_content += form_submit(INTL_SPEICHERN);
+		page_content += F("</table><br/><br/><br/><b>APIs</b><br/>");
 		page_content += form_checkbox(F("send2dusti"),F("API Luftdaten.info"),send2dusti);
 		page_content += form_checkbox(F("send2madavi"),F("API Madavi.de"),send2madavi);
-		page_content += F("<br/><b>Sensoren</b><br/>");
+		
+		page_content += F("<br/><b>");
+		page_content += FPSTR(INTL_SENSOREN);
+		page_content += F("</b><br/>");
 		page_content += form_checkbox(F("sds_read"),F("SDS011 (Feinstaub)"),sds_read);
 		page_content += form_checkbox(F("dht_read"),F("DHT22 (Temp.,Luftfeuchte)"),dht_read);
 		page_content += form_checkbox(F("ppd_read"),F("PPD42NS"),ppd_read);
@@ -883,10 +911,10 @@ void webserver_config() {
 		page_content += form_checkbox(F("gps_read"),F("GPS (NEO 6M)"),gps_read);
 		page_content += F("<br/><b>Weitere Einstellungen</b><br/>");
 		page_content += form_checkbox(F("auto_update"),F("Auto Update"),auto_update);
-		page_content += form_checkbox(F("has_display"),F("Display"),has_display);
+		page_content += form_checkbox(F("has_display"),FPSTR(INTL_DISPLAY),has_display);
 		page_content += F("<table>");
 		page_content += form_input(F("debug"),F("Debug&nbsp;Level"),String(debug),5);
-		page_content += F("</table><br/><b>Weitere APIs</b><br/><br/>");
+		page_content += _intl("</table><br/><b>{s}</b><br/><br/>",FPSTR(INTL_WEITERE_APIS));
 		page_content += form_checkbox(F("send2sensemap"),F("An OpenSenseMap senden"),send2sensemap);
 		page_content += F("<table>");
 		page_content += form_input(F("senseboxid"),F("senseBox-ID: "),senseboxid,50);
@@ -906,8 +934,8 @@ void webserver_config() {
 		page_content += form_input(F("httpPort_influxdb"),F("Port: "),String(httpPort_influxdb),30);
 		page_content += form_input(F("user_influxdb"),F("Benutzer: "),user_influxdb,50);
 		page_content += form_input(F("pwd_influxdb"),F("Passwort: "),pwd_influxdb,50);
-		page_content += F("</table><br/>");
-		page_content += F("<br/><input type='submit' name='submit' value='Speichern'/></form>");
+		page_content += form_submit(INTL_SPEICHERN);
+		page_content += F("</table></form><br/><br/>");
 	} else {
 
 #define readCharParam(param) if (server.hasArg(#param)){ server.arg(#param).toCharArray(param, sizeof(param)); }
@@ -2396,3 +2424,4 @@ void loop() {
 	server.handleClient();
 	yield();
 }
+
