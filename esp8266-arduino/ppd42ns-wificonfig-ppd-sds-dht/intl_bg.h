@@ -1,0 +1,24 @@
+const char INTL_UBERSICHT[] PROGMEM = "Übersicht";
+const char INTL_KONFIGURATION[] PROGMEM = "Конфигурация - ";
+const char INTL_FEINSTAUBSENSOR[] PROGMEM = "Сензор за прахови частици";
+const char INTL_WLAN_DATEN[] PROGMEM = "Настройки за WiFi";
+const char INTL_KEINE_NETZWERKE[] PROGMEM =  "Няма намерени мрежи";
+const char INTL_NETZWERKE_GEFUNDEN[] = "Намерени мрежи: ";
+const char INTL_AB_HIER_NUR_ANDERN[] PROGMEM = "От тук надолу не променяй, освен ако наистина знаете какво правите";
+const char INTL_SPEICHERN[] PROGMEM = "Запиши";
+const char INTL_SENSOREN[] PROGMEM = "Сензори";
+const char INTL_BASICAUTH[] PROGMEM = "Оторизация";
+const char INTL_WEITERE_EINSTELLUNGEN[] PROGMEM ="Weitere Einstellungen";
+const char INTL_AUTO_UPDATE[] PROGMEM = "Автоматична актуализация";
+const char INTL_DISPLAY[] PROGMEM = "Екран";
+const char INTL_DEBUG_LEVEL[] PROGMEM = "Debug&nbsp;Level";
+const char INTL_WEITERE_APIS[] PROGMEM = "Още API";
+const char INTL_AN_EIGENE_API_SENDEN[] PROGMEM = "Изпращане към собствено API";
+const char INTL_SERVER[] PROGMEM = "Сървър:"; 
+const char INTL_PFAD[] PROGMEM = "Път:"; 
+const char INTL_PORT[] PROGMEM = "Порт:"; 
+const char INTL_BENUTZER[] PROGMEM = "потребител:"; 
+const char INTL_PASSWORT[] PROGMEM = "Парола:"; 
+const char INTL_SENDEN_AN[] PROGMEM = "Изпрати до {v}"; 
+const char INTL_LESE[] PROGMEM = "Получено от";
+

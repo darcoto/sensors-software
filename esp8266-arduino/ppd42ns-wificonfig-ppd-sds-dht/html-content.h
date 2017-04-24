@@ -19,7 +19,7 @@ input[type='submit']{border-radius:5px;font-size:medium;padding:5px;}\
 .submit_blue{padding:9px !important;width:100%;border-style:none;background:blue;color:white;text-align:left;}\
 </style>\
 </head><body>\
-<h3 style='min-height:100px;'><a href='/' style='background:none;width:0;'><img src='/luftdaten_logo.svg' style='float:left;margin-right:20px'/></a>{t} Feinstaubsensor {id}<br/><small>MAC: {mac}<br/>Firmware {fw}</small></h3>\
+<h3 style='min-height:100px;'><a href='/' style='background:none;width:0;'><img src='/luftdaten_logo.svg' style='float:left;margin-right:20px'/></a>{t} {tt} {id}<br/><small>MAC: {mac}<br/>Firmware {fw}</small></h3>\
 ";
 
 const char WEB_PAGE_FOOTER[] PROGMEM = "<br/><br/><a href='/' style='display:inline;'>Zurück zur Startseite</a><br/><br/><br/>\
