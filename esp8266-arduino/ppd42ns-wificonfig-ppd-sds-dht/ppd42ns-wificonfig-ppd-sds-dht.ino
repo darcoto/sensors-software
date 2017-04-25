@@ -762,11 +762,6 @@ String form_submit(const String& value) {
 	return s;
 }
 
-<<<<<<< Updated upstream
-String _intl(const String& patt, const String& value) {
-	String s = F("{p}");
-	s.replace("{s}",patt);s.replace("{s}",value);
-=======
 String intl(const String& patt, const String& value) {
 	String s = F("{patt}");
 	s.replace("{patt}",value);s.replace("{v}",value);
@@ -776,7 +771,6 @@ String intl(const String& patt, const String& value) {
 String line_from_value(const String& name, const String& value) {
 	String s = F("<br>{patt}");
 	s.replace("{patt}",value);s.replace("{v}",value);
->>>>>>> Stashed changes
 	return s;
 }
 
@@ -866,11 +860,7 @@ void webserver_config() {
 				page_content += FPSTR(INTL_KEINE_NETZWERKE);
 				page_content += F("<br/>");
 			} else {
-<<<<<<< Updated upstream
-				page_content += F("<br/>");
-=======
 				debug_out(F("Vesko 1a"),DEBUG_MIN_INFO,1);
->>>>>>> Stashed changes
 				page_content += FPSTR(INTL_NETZWERKE_GEFUNDEN);
 				page_content += String(n);
 				page_content += F("<br/>");
