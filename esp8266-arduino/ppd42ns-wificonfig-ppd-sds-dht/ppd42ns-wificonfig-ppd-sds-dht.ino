@@ -63,6 +63,15 @@
 /*****************************************************************
 /* Includes                                                      *
 /*****************************************************************/
+/*
+#if defined(INTL_BG)
+#include "intl_bg.h"
+#else
+#include "intl_de.h"
+#endif
+*/
+
+
 #if defined(ESP8266)
 #include <FS.h>                     // must be first
 #include <ESP8266WiFi.h>
@@ -860,7 +869,6 @@ void webserver_config() {
 				page_content += FPSTR(INTL_KEINE_NETZWERKE);
 				page_content += F("<br/>");
 			} else {
-				debug_out(F("Vesko 1a"),DEBUG_MIN_INFO,1);
 				page_content += FPSTR(INTL_NETZWERKE_GEFUNDEN);
 				page_content += String(n);
 				page_content += F("<br/>");
@@ -873,7 +881,6 @@ void webserver_config() {
 						}
 					}
 				}
-				debug_out(F("Vesko 1b"),DEBUG_MIN_INFO,1);
 				String cssid;
 				for (int i = 0; i < n; i++) {
 					if (indices[i] == -1) continue;
@@ -884,7 +891,6 @@ void webserver_config() {
 						}
 					}
 				}
-				debug_out(F("Vesko 1c"),DEBUG_MIN_INFO,1);
 				page_content += F("<br/><table>");
 				for (int i = 0; i < n; ++i) {
 					if (indices[i] == -1) continue;
@@ -893,35 +899,25 @@ void webserver_config() {
 				}
 				page_content += F("</table><br/><br/>");
 			}
-			debug_out(F("Vesko 1d"),DEBUG_MIN_INFO,1);
 		}
-		debug_out(F("Vesko 1e"),DEBUG_MIN_INFO,1);
 		page_content += F("<table>");
-debug_out(F("Vesko 1f"),DEBUG_MIN_INFO,1);
 		page_content += form_input(F("wlanssid"),F("WLAN"),wlanssid,64);
-debug_out(F("Vesko 1j"),DEBUG_MIN_INFO,1);		
-		page_content += form_password(F("wlanpwd"),F("Passwort"),wlanpwd,64);
-debug_out(F("Vesko 1z"),DEBUG_MIN_INFO,1);		
-		page_content += form_submit(INTL_SPEICHERN);
-debug_out(F("Vesko 1"),DEBUG_MIN_INFO,1);
-
+		page_content += form_password(F("wlanpwd"),F("Passwort"),wlanpwd,64);	
+		page_content += form_submit(FPSTR(INTL_SPEICHERN));
 		page_content += FPSTR("</table><br/><br/><br/><b>");
 		page_content += FPSTR(INTL_AB_HIER_NUR_ANDERN);
 		page_content += F("</b><br/><br/><b>");
-		page_content += FPSTR(INTL_BASICAUTH);
-debug_out(F("Vesko 2"),DEBUG_MIN_INFO,1);		
+		page_content += FPSTR(INTL_BASICAUTH);		
 		page_content += F("</b><br/>");
-debug_out(F("Vesko 3"),DEBUG_MIN_INFO,1);
 		page_content += F("<table>");
 		page_content += form_input(F("www_username"),F("User"),www_username,64);
 		page_content += form_password(F("www_password"),F("Passwort"),www_password,64);
 		page_content += form_checkbox(F("www_basicauth_enabled"),FPSTR(INTL_BASICAUTH),www_basicauth_enabled);
-		page_content += form_submit(INTL_SPEICHERN);
+		page_content += form_submit(FPSTR(INTL_SPEICHERN));
 		page_content += F("</table><br/><br/><br/><b>APIs</b><br/>");
 		page_content += form_checkbox(F("send2dusti"),F("API Luftdaten.info"),send2dusti);
 		page_content += form_checkbox(F("send2madavi"),F("API Madavi.de"),send2madavi);
 		page_content += F("<br/><b>");		
-debug_out(F("Vesko 4"),DEBUG_MIN_INFO,1);
 		page_content += FPSTR(INTL_SENSOREN);
 		page_content += F("</b><br/>");
 		page_content += form_checkbox(F("sds_read"),F("SDS011 (Feinstaub)"),sds_read);
@@ -929,44 +925,35 @@ debug_out(F("Vesko 4"),DEBUG_MIN_INFO,1);
 		page_content += form_checkbox(F("ppd_read"),F("PPD42NS"),ppd_read);
 		page_content += form_checkbox(F("bmp_read"),F("BMP180"),bmp_read);
 		page_content += form_checkbox(F("bme280_read"),F("BME280"),bme280_read);
-		page_content += form_checkbox(F("gps_read"),F("GPS (NEO 6M)"),gps_read);
-debug_out(F("Vesko 4a"),DEBUG_MIN_INFO,1);		
-		page_content += F("<br/><b>"); page_content += FPSTR(INTL_WEITERE_EINSTELLUNGEN); page_content+=("</b><br/>");
-debug_out(F("Vesko 4aa"),DEBUG_MIN_INFO,1);		
-
-		page_content += form_checkbox(F("auto_update"),INTL_AUTO_UPDATE,auto_update);
-		page_content += form_checkbox(F("has_display"),INTL_DISPLAY,has_display);
+		page_content += form_checkbox(F("gps_read"),F("GPS (NEO 6M)"),gps_read);		
+		page_content += F("<br/><b>"); page_content += FPSTR(INTL_WEITERE_EINSTELLUNGEN); page_content+=("</b><br/>");	
+		page_content += form_checkbox(F("auto_update"),FPSTR(INTL_AUTO_UPDATE),auto_update);
+		page_content += form_checkbox(F("has_display"),FPSTR(INTL_DISPLAY),has_display);
 		page_content += F("<table>");
-		page_content += form_input(F("debug"),INTL_DEBUG_LEVEL,String(debug),5);
-debug_out(F("Vesko 4b"),DEBUG_MIN_INFO,1);		
+		page_content += form_input(F("debug"),FPSTR(INTL_DEBUG_LEVEL),String(debug),5);	
 		page_content += F("</table><br/><b>Weitere APIs</b><br/><br/>");
-		page_content += form_checkbox(F("send2sensemap"),intl(INTL_SENDEN_AN,"OpenSenseMap"),send2sensemap);
+		page_content += form_checkbox(F("send2sensemap"),intl(FPSTR(INTL_SENDEN_AN),"OpenSenseMap"),send2sensemap);
 		page_content += F("<table>");
 		page_content += form_input(F("senseboxid"),F("senseBox-ID: "),senseboxid,50);
-		page_content += F("</table><br/>");
-debug_out(F("Vesko 4c"),DEBUG_MIN_INFO,1);		
-		page_content += form_checkbox(F("send2custom"),INTL_AN_EIGENE_API_SENDEN,send2custom);
+		page_content += F("</table><br/>");	
+		page_content += form_checkbox(F("send2custom"),FPSTR(INTL_AN_EIGENE_API_SENDEN),send2custom);
 		page_content += F("<table>");
-		page_content += form_input(F("host_custom"),INTL_SERVER,host_custom,50);
-		page_content += form_input(F("url_custom"),INTL_PFAD,url_custom,50);
-debug_out(F("Vesko 4d"),DEBUG_MIN_INFO,1);		
-		page_content += form_input(F("httpPort_custom"),INTL_PORT,String(httpPort_custom),30);
-		page_content += form_input(F("user_custom"),INTL_BENUTZER,user_custom,50);
-debug_out(F("Vesko 4e"),DEBUG_MIN_INFO,1);		
-		page_content += form_input(F("pwd_custom"),INTL_PASSWORT,pwd_custom,50);
-		page_content += F("</table><br/>");
-debug_out(F("Vesko 5"),DEBUG_MIN_INFO,1);		
-		page_content += form_checkbox(F("send2influxdb"),F("Senden an InfluxDB"),send2influxdb);
+		page_content += form_input(F("host_custom"),FPSTR(INTL_SERVER),host_custom,50);
+		page_content += form_input(F("url_custom"),FPSTR(INTL_PFAD),url_custom,50);	
+		page_content += form_input(F("httpPort_custom"),FPSTR(INTL_PORT),String(httpPort_custom),30);
+		page_content += form_input(F("user_custom"),FPSTR(INTL_BENUTZER),user_custom,50);		
+		page_content += form_input(F("pwd_custom"),FPSTR(INTL_PASSWORT),pwd_custom,50);
+		page_content += F("</table><br/>");	
+		page_content += form_checkbox(F("send2influxdb"),intl(FPSTR(INTL_SENDEN_AN),"InfluxDB"),send2influxdb);
 		page_content += F("<table>");
-		page_content += form_input(F("host_influxdb"),INTL_SERVER,host_influxdb,50);
-		page_content += form_input(F("url_influxdb"),INTL_PFAD,url_influxdb,50);
-		page_content += form_input(F("httpPort_influxdb"),INTL_PORT,String(httpPort_influxdb),30);
-		page_content += form_input(F("user_influxdb"),INTL_BENUTZER,user_influxdb,50);
-		page_content += form_input(F("pwd_influxdb"),INTL_BENUTZER,pwd_influxdb,50);
-		page_content += form_submit(INTL_SPEICHERN);
+		page_content += form_input(F("host_influxdb"),FPSTR(INTL_SERVER),host_influxdb,50);
+		page_content += form_input(F("url_influxdb"),FPSTR(INTL_PFAD),url_influxdb,50);
+		page_content += form_input(F("httpPort_influxdb"),FPSTR(INTL_PORT),String(httpPort_influxdb),30);
+		page_content += form_input(F("user_influxdb"),FPSTR(INTL_BENUTZER),user_influxdb,50);
+		page_content += form_input(F("pwd_influxdb"),FPSTR(INTL_PASSWORT),pwd_influxdb,50);
+		page_content += form_submit(FPSTR(INTL_SPEICHERN));
 		page_content += F("</table><br/>");
 		page_content += F("<br/></form>");
-		debug_out(F("Vesko 6"),DEBUG_MIN_INFO,1);
 	} else {
 
 #define readCharParam(param) if (server.hasArg(#param)){ server.arg(#param).toCharArray(param, sizeof(param)); }
