@@ -63,14 +63,6 @@
 /*****************************************************************
 /* Includes                                                      *
 /*****************************************************************/
-/*
-#if defined(INTL_BG)
-#include "intl_bg.h"
-#else
-#include "intl_de.h"
-#endif
-*/
-
 
 #if defined(ESP8266)
 #include <FS.h>                     // must be first
@@ -746,6 +738,26 @@ void create_basic_auth_strings() {
 /*****************************************************************
 /* html helper functions                                         *
 /*****************************************************************/
+
+String make_header(const String& title){
+	String s = "";
+	s+= FPSTR(WEB_PAGE_HEADER);
+	s.replace("{tt}",FPSTR(INTL_FEINSTAUBSENSOR));
+	s.replace("{t}",title);
+	s.replace("{id}",esp_chipid);
+	s.replace("{mac}",WiFi.macAddress());
+	s.replace("{fwt}",FPSTR(INTL_FIRMWARE));
+	s.replace("{fw}",SOFTWARE_VERSION);
+	return s;
+}
+
+String make_footer(){
+	String s = "";
+	s+= FPSTR(WEB_PAGE_FOOTER);
+	s.replace("{t}",FPSTR(INTL_ZURUCK_ZUR_STARTSEITE));
+	return s;
+}
+
 String form_input(const String& name, const String& info, const String& value, const int length) {
 	String s = F("<tr><td>{i} </td><td style='width:90%;'><input type='text' name='{n}' id='{n}' placeholder='{i}' value='{v}' maxlength='{l}'/></td></tr>");
 	s.replace("{i}",info);s.replace("{n}",name);s.replace("{v}",value);s.replace("{l}",String(length));
@@ -774,6 +786,12 @@ String form_submit(const String& value) {
 String intl(const String& patt, const String& value) {
 	String s = F("{patt}");
 	s.replace("{patt}",value);s.replace("{v}",value);
+	return s;
+}
+
+String intl(const String& patt, const String& value1, const String& value2) {
+	String s = F("{patt}");
+	s.replace("{patt}",patt);s.replace("{v1}",value1),s.replace("{v2}",value2);
 	return s;
 }
 
@@ -816,7 +834,7 @@ void webserver_request_auth() {
 /* Webserver root: show all options                              *
 /*****************************************************************/
 void webserver_root() {
-	if (WiFi.status() != WL_CONNECTED) {
+	if (0 && WiFi.status() != WL_CONNECTED) {
 		server.sendHeader(F("Location"),F("http://192.168.4.1/config"));
 		server.send(302,FPSTR(TXT_CONTENT_TYPE_TEXT_HTML),"");
 	} else {
@@ -825,13 +843,14 @@ void webserver_root() {
 		String page_content = "";
 		last_page_load = millis();
 		debug_out(F("output root page..."),DEBUG_MIN_INFO,1);
-		page_content = FPSTR(WEB_PAGE_HEADER);
-		page_content.replace("{t}",F("Übersicht"));
-		page_content.replace("{id}",esp_chipid);
-		page_content.replace("{mac}",WiFi.macAddress());
-		page_content.replace("{fw}",SOFTWARE_VERSION);
+		page_content = make_header(FPSTR(INTL_UBERSICHT));
 		page_content += FPSTR(WEB_ROOT_PAGE_CONTENT);
-		page_content += FPSTR(WEB_PAGE_FOOTER);
+		page_content.replace("{t}",FPSTR(INTL_AKTUELLE_WERTE));
+		page_content.replace("{karte}",FPSTR(INTL_KARTE_DER_AKTIVEN_SENSOREN));
+		page_content.replace("{conf}",FPSTR(INTL_KONFIGURATION));
+		page_content.replace("{conf_delete}",FPSTR(INTL_KONFIGURATION_LOSCHEN));
+		page_content.replace("{restart}",FPSTR(INTL_SENSOR_NEU_STARTEN));
+		page_content += make_footer();
 		server.send(200,FPSTR(TXT_CONTENT_TYPE_TEXT_HTML),page_content);
 	}
 }
@@ -846,12 +865,7 @@ void webserver_config() {
 	last_page_load = millis();
 
 	debug_out(F("output config page ..."),DEBUG_MIN_INFO,1);
-	page_content += FPSTR(WEB_PAGE_HEADER);
-	page_content.replace("{t}",FPSTR(INTL_KONFIGURATION));
-	page_content.replace("{tt}",FPSTR(INTL_FEINSTAUBSENSOR));
-	page_content.replace("{id}",esp_chipid);
-	page_content.replace("{mac}",WiFi.macAddress());
-	page_content.replace("{fw}",SOFTWARE_VERSION);
+	page_content += make_header(FPSTR(INTL_KONFIGURATION));
 	page_content += FPSTR(WEB_CONFIG_SCRIPT);
 	if (server.method() == HTTP_GET) {
 		page_content += F("<form method='POST' action='/config' style='width: 100%;'>");
@@ -952,7 +966,7 @@ void webserver_config() {
 		page_content += form_input(F("user_influxdb"),FPSTR(INTL_BENUTZER),user_influxdb,50);
 		page_content += form_input(F("pwd_influxdb"),FPSTR(INTL_PASSWORT),pwd_influxdb,50);
 		page_content += form_submit(FPSTR(INTL_SPEICHERN));
-		page_content += F("</table><br/>");
+		page_content += F("</table>");
 		page_content += F("<br/></form>");
 	} else {
 
@@ -1002,36 +1016,36 @@ void webserver_config() {
 
 		config_needs_write = true;
 
-		page_content += line_from_value(intl(INTL_SENDEN_AN,"Luftdaten.info"),String(send2dusti));
-		page_content += F("<br/>Senden an Madavi: "); page_content += String(send2madavi);
-		page_content += F("<br/>Lese DHT "); page_content += String(dht_read);
-		page_content += F("<br/>Lese SDS "); page_content += String(sds_read);
-		page_content += F("<br/>Lese PPD "); page_content += String(ppd_read);
-		page_content += F("<br/>Lese BMP180 "); page_content += String(bmp_read);
-		page_content += F("<br/>Lese BME280 "); page_content += String(bme280_read);
-		page_content += F("<br/>Lese GPS "); page_content += String(gps_read);
-		page_content += F("<br/>Auto Update "); page_content += String(auto_update);
-		page_content += F("<br/>Display "); page_content += String(has_display);
-		page_content += F("<br/>Debug Level "); page_content += String(debug);
-		page_content += F("<br/>Senden an opensensemap "); page_content += String(send2sensemap);
+		page_content += line_from_value(intl(FPSTR(INTL_SENDEN_AN),"Luftdaten.info"),String(send2dusti));
+		page_content += line_from_value(intl(FPSTR(INTL_SENDEN_AN),"Madavi"),String(send2madavi));
+		page_content += line_from_value(intl(FPSTR(INTL_LESE),"DHT"),String(dht_read));
+		page_content += line_from_value(intl(FPSTR(INTL_LESE),"SDS"),String(sds_read));
+		page_content += line_from_value(intl(FPSTR(INTL_LESE),"PPD"),String(ppd_read));
+		page_content += line_from_value(intl(FPSTR(INTL_LESE),"BMP180"),String(bmp_read));
+		page_content += line_from_value(intl(FPSTR(INTL_LESE),"BME280"),String(bme280_read));
+		page_content += line_from_value(intl(FPSTR(INTL_LESE),"GPS"),String(gps_read));
+		page_content += line_from_value(FPSTR(INTL_AUTO_UPDATE),String(auto_update));
+		page_content += line_from_value(FPSTR(INTL_DISPLAY),String(has_display));
+		page_content += line_from_value(FPSTR(INTL_DEBUG_LEVEL),String(debug));
+		page_content += line_from_value(intl(FPSTR(INTL_SENDEN_AN),"opensensemap"),String(send2sensemap));
 		page_content += F("<br/>senseBox-ID "); page_content += senseboxid;
-		page_content += F("<br/>Debug Level "); page_content += String(debug);
+		//page_content += ine_from_value(FPSTR(Debug Level,String(debug);
 		page_content += F("<br/><br/>Eigene API "); page_content += String(send2custom);
-		page_content += F("<br/>Server "); page_content += host_custom;
-		page_content += F("<br/>Pfad "); page_content += url_custom;
-		page_content += F("<br/>Port "); page_content += String(httpPort_custom);
-		page_content += F("<br/>Benutzer "); page_content += user_custom;
-		page_content += F("<br/>Passwort "); page_content += pwd_custom;
+		page_content += line_from_value(FPSTR(INTL_SERVER),host_custom);
+		page_content += line_from_value(FPSTR(INTL_PFAD),url_custom);
+		page_content += line_from_value(FPSTR(INTL_PORT),String(httpPort_custom));
+		page_content += line_from_value(FPSTR(INTL_BENUTZER),user_custom);
+		page_content += line_from_value(FPSTR(INTL_PASSWORT),pwd_custom);
 		page_content += F("<br/><br/>InfluxDB "); page_content += String(send2influxdb);
-		page_content += F("<br/>Server "); page_content += host_influxdb;
-		page_content += F("<br/>Pfad "); page_content += url_influxdb;
-		page_content += F("<br/>Port "); page_content += String(httpPort_influxdb);
-		page_content += F("<br/>Benutzer "); page_content += user_influxdb;
-		page_content += F("<br/>Passwort "); page_content += pwd_influxdb;
-		page_content += F("<br/><br/><a href='/reset?confirm=yes'>Gerät neu starten?</a>");
+		page_content += line_from_value(FPSTR(INTL_SERVER),host_influxdb);
+		page_content += line_from_value(FPSTR(INTL_PFAD),url_influxdb);
+		page_content += line_from_value(FPSTR(INTL_PORT),String(httpPort_influxdb));
+		page_content += line_from_value(FPSTR(INTL_BENUTZER),user_influxdb);
+		page_content += line_from_value(FPSTR(INTL_PASSWORT),pwd_influxdb);
+		page_content += F("<br/><br/><a href='/reset?confirm=yes'>"); page_content += FPSTR(INTL_GERAT_NEU_STARTEN); page_content += F("?</a>");
 
 	}
-	page_content += FPSTR(WEB_PAGE_FOOTER);
+	page_content += make_footer();
 	server.send(200,FPSTR(TXT_CONTENT_TYPE_TEXT_HTML),page_content);
 }
 
@@ -1053,11 +1067,7 @@ void webserver_values() {
 		int signal_quality = (signal_temp+100)*2;
 		int value_count = 0;
 		debug_out(F("output values to web page..."),DEBUG_MIN_INFO,1);
-		page_content += FPSTR(WEB_PAGE_HEADER);
-		page_content.replace("{t}",F("Aktuelle Werte"));
-		page_content.replace("{id}",esp_chipid);
-		page_content.replace("{mac}",WiFi.macAddress());
-		page_content.replace("{fw}",SOFTWARE_VERSION);
+		page_content += make_header(F("Aktuelle Werte"));
 		page_content += F("<table>");
 		if (ppd_read) {
 			page_content += table_row_from_value(F("PPD42NS&nbsp;PM1:"),last_value_PPD_P1+F("&nbsp;Partikel/Liter"));
@@ -1084,7 +1094,7 @@ void webserver_values() {
 		page_content += table_row_from_value(F("WiFi&nbsp;Signal"),String(signal_strength)+"&nbsp;dBm");
 		page_content += table_row_from_value(F("Signal&nbsp;Qualität"),String(signal_quality)+"%");
 		page_content += F("</table>");
-		page_content += FPSTR(WEB_PAGE_FOOTER);
+		page_content += make_footer();
 		server.send(200,FPSTR(TXT_CONTENT_TYPE_TEXT_HTML),page_content);
 	}
 #endif
@@ -1099,22 +1109,19 @@ void webserver_debug_level() {
 	String page_content = "";
 	last_page_load = millis();
 	debug_out(F("output change debug level page..."),DEBUG_MIN_INFO,1);
-	page_content += FPSTR(WEB_PAGE_HEADER);
-	page_content.replace("{t}","Debug level");
-	page_content.replace("{id}",esp_chipid);
-	page_content.replace("{mac}",WiFi.macAddress());
-	page_content.replace("{fw}",SOFTWARE_VERSION);
+	page_content += make_header(FPSTR(INTL_DEBUG_LEVEL));
+	
 	if (server.hasArg("level")) {
 		switch (server.arg("level").toInt()) {
-			case (0): debug=0; page_content += F("<h3>Setze Debug auf none.</h3>");break;
-			case (1): debug=1; page_content += F("<h3>Setze Debug auf error.</h3>");break;
-			case (2): debug=2; page_content += F("<h3>Setze Debug auf warning.</h3>");break;
-			case (3): debug=3; page_content += F("<h3>Setze Debug auf min. info.</h3>");break;
-			case (4): debug=4; page_content += F("<h3>Setze Debug auf med. info.</h3>");break;
-			case (5): debug=5; page_content += F("<h3>Setze Debug auf max. info.</h3>");break;
+			case (0): debug=0; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_NONE));break;
+			case (1): debug=1; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_ERROR));break;
+			case (2): debug=2; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_WARNING));break;
+			case (3): debug=3; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MIN_INFO));break;
+			case (4): debug=4; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MED_INFO));break;
+			case (5): debug=5; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MAX_INFO));break;
 		}
 	}
-	page_content += FPSTR(WEB_PAGE_FOOTER);
+	page_content += make_footer();
 	server.send(200, FPSTR(TXT_CONTENT_TYPE_TEXT_HTML), page_content);
 }
 
@@ -1127,28 +1134,29 @@ void webserver_removeConfig() {
 	String page_content = "";
 	last_page_load = millis();
 	debug_out(F("output remove config page..."),DEBUG_MIN_INFO,1);
-	page_content += FPSTR(WEB_PAGE_HEADER);
-	page_content.replace("{t}","Config.json löschen");
-	page_content.replace("{id}",esp_chipid);
-	page_content.replace("{mac}",WiFi.macAddress());
-	page_content.replace("{fw}",SOFTWARE_VERSION);
+	page_content += make_header(FPSTR(INTL_CONFIG_LOSCHEN));
+	
 	if (server.method() == HTTP_GET) {
 		page_content += FPSTR(WEB_REMOVE_CONFIG_CONTENT);
+		page_content.replace("{t}",FPSTR(INTL_KONFIGURATION_WIRKLICH_LOSCHEN));
+		page_content.replace("{b}",FPSTR(INTL_LOSCHEN));
+		page_content.replace("{c}",FPSTR(INTL_ABBRECHEN));
+		
 	} else {
 #if defined(ESP8266)
 		if (SPIFFS.exists("/config.json")) {	//file exists
 			debug_out(F("removing config.json..."),DEBUG_MIN_INFO,1);
 			if (SPIFFS.remove("/config.json")) {
-				page_content += F("<h3>Config.json gelöscht.</h3>");
+				page_content += intl("<h3>{v}.</h3>",FPSTR(INTL_CONFIG_GELOSCHT));
 			} else {
-				page_content += F("<h3>Config.json konnte nicht gelöscht werden.</h3>");
+				page_content += intl("<h3>{v}.</h3>",FPSTR(INTL_CONFIG_KONNTE_NICHT_GELOSCHT_WERDEN));
 			}
 		} else {
-			page_content += F("<h3>Config.json nicht gefunden.</h3>");
+			page_content += intl("<h3>{v}}.</h3>",FPSTR(INTL_CONFIG_NICHT_GEFUNDEN));
 		}
 #endif
 	}
-	page_content += FPSTR(WEB_PAGE_FOOTER);
+	page_content += make_footer();
 	server.send(200, FPSTR(TXT_CONTENT_TYPE_TEXT_HTML), page_content);
 }
 
@@ -1161,19 +1169,19 @@ void webserver_reset() {
 	String page_content = "";
 	last_page_load = millis();
 	debug_out(F("output reset NodeMCU page..."),DEBUG_MIN_INFO,1);
-	page_content += FPSTR(WEB_PAGE_HEADER);
-	page_content.replace("{t}","Sensor neu starten");
-	page_content.replace("{id}",esp_chipid);
-	page_content.replace("{mac}",WiFi.macAddress());
-	page_content.replace("{fw}",SOFTWARE_VERSION);
+	page_content += make_header(FPSTR(INTL_SENSOR_NEU_STARTEN));
+	
 	if (server.method() == HTTP_GET) {
 		page_content += FPSTR(WEB_RESET_CONTENT);
+		page_content.replace("{t}",FPSTR(INTL_SENSOR_WIRKLICH_NEU_STARTEN));
+		page_content.replace("{b}",FPSTR(INTL_NEU_STARTEN));
+		page_content.replace("{c}",FPSTR(INTL_ABBRECHEN));
 	} else {
 #if defined(ESP8266)
 		ESP.restart();
 #endif
 	}
-	page_content += FPSTR(WEB_PAGE_FOOTER);
+	page_content += make_footer();
 	server.send(200, FPSTR(TXT_CONTENT_TYPE_TEXT_HTML), page_content);
 }
 

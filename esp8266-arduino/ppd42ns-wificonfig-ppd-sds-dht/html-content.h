@@ -19,18 +19,20 @@ input[type='submit']{border-radius:5px;font-size:medium;padding:5px;}\
 .submit_blue{padding:9px !important;width:100%;border-style:none;background:blue;color:white;text-align:left;}\
 </style>\
 </head><body>\
-<h3 style='min-height:100px;'><a href='/' style='background:none;width:0;'><img src='/luftdaten_logo.svg' style='float:left;margin-right:20px'/></a>{t} {tt} {id}<br/><small>MAC: {mac}<br/>Firmware {fw}</small></h3>\
-";
+<h3 style='min-height:100px;'>\
+	<a href='/' style='background:none;width:0;'><img src='/luftdaten_logo.svg' style='float:left;margin-right:20px'/></a>\
+	{tt} {t} <br/>\
+	<small>ID: {id}<br/>MAC: {mac}<br/>{fwt}: {fw}</small></h3>";
 
-const char WEB_PAGE_FOOTER[] PROGMEM = "<br/><br/><a href='/' style='display:inline;'>Zurück zur Startseite</a><br/><br/><br/>\
+const char WEB_PAGE_FOOTER[] PROGMEM = "<br/><br/><a href='/' style='display:inline;'>{t}</a><br/><br/><br/>\
 <a href='http://codefor.de/' target='_blank' style='display:inline;background:none;width:0px;'><img src='/cfg_logo.svg' style='width:200px;max-width:50%;'/></a>\
 </body></html>\r\n";
 
-const char WEB_ROOT_PAGE_CONTENT[] PROGMEM = "<a href='/values'>Aktuelle Werte</a><br/>\
-<a href='http://deutschland.maps.luftdaten.info/' target='_blank'>Karte der aktiven Sensoren (externer Link)</a><br/>\
-<a href='/config'>Konfiguration</a><br/>\
-<a href='/removeConfig'>Konfiguration löschen</a><br/>\
-<a href='/reset'>Sensor neu starten (Reset)</a><br/>\
+const char WEB_ROOT_PAGE_CONTENT[] PROGMEM = "<a href='/values'>{t}</a><br/>\
+<a href='http://deutschland.maps.luftdaten.info/' target='_blank'>{karte}</a><br/>\
+<a href='/config'>{conf}</a><br/>\
+<a href='/removeConfig'>{conf_delete}</a><br/>\
+<a href='/reset'>{restart}</a><br/>\
 <table style='width:100%;'>\
 <tr><td style='width:33%;'><a href='/debug?level=0'>Debug null</a></td>\
 <td style='width:33%;'><a href='/debug?level=1'>Debug Error</a></td>\
@@ -45,12 +47,12 @@ const char WEB_ROOT_PAGE_CONTENT[] PROGMEM = "<a href='/values'>Aktuelle Werte</
 
 const char WEB_CONFIG_SCRIPT[] PROGMEM = "<script>function setSSID(ssid){document.getElementById('wlanssid').value=ssid.innerText||ssid.textContent;document.getElementById('wlanpwd').focus();}</script>";
 
-const char WEB_REMOVE_CONFIG_CONTENT[] PROGMEM = "<h3>Konfiguration wirklich löschen?</h3>\
-<table><tr><td><form method='POST' action='/removeConfig'><input type='submit' class='submit_blue' name='submit' value='Löschen'/></form></td><td><a href='/'>Abbrechen</a></td></tr></table>\
+const char WEB_REMOVE_CONFIG_CONTENT[] PROGMEM = "<h3>{t}?</h3>\
+<table><tr><td><form method='POST' action='/removeConfig'><input type='submit' class='submit_blue' name='submit' value='{b}'/></form></td><td><a href='/'>{c}</a></td></tr></table>\
 ";
 
-const char WEB_RESET_CONTENT[] PROGMEM = "<h3>Sensor wirklich neu starten?</h3>\
-<table><tr><td><form method='POST' action'/reset'><input type='submit' class='submit_blue' name='submit' value='Neu starten'/></form></td><td><a href='/'>Abbrechen</a></td></tr></table>\
+const char WEB_RESET_CONTENT[] PROGMEM = "<h3>{t}?</h3>\
+<table><tr><td><form method='POST' action'/reset'><input type='submit' class='submit_blue' name='submit' value='{b}'/></form></td><td><a href='/'>{c}</a></td></tr></table>\
 ";
 
 const char LUFTDATEN_INFO_LOGO_SVG[] PROGMEM = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
