@@ -16,6 +16,9 @@
 #define WLANSSID "Freifunk-disabled"
 #define WLANPWD ""
 
+//Lang Konfig
+#define CURRENT_LANG "DE"
+
 // BasicAuth Konfig
 #define WWW_USERNAME "admin"
 #define WWW_PASSWORD "feinstaub"

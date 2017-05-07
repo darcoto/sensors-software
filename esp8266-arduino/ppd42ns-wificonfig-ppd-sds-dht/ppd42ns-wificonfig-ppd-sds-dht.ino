@@ -103,7 +103,7 @@
 /*****************************************************************/
 char wlanssid[65] = "Freifunk-disabled";
 char wlanpwd[65] = "";
-
+char current_lang[3] = "DE";
 char www_username[65] = "admin";
 char www_password[65] = "feinstaub";
 bool www_basicauth_enabled = 0;
@@ -156,7 +156,8 @@ char user_custom[100] = "";
 char pwd_custom[100] = "";
 String basic_auth_custom = "";
 
-const char* update_host = "www.madavi.de";
+//const char* update_host = "www.madavi.de";
+const char* update_host = "192.168.77.164";
 const char* update_url = "/sensor/update/firmware.php";
 const int update_port = 80;
 
@@ -543,6 +544,8 @@ void copyExtDef() {
 
 	strcpyDef(wlanssid, WLANSSID);
 	strcpyDef(wlanpwd, WLANPWD);
+	strcpyDef(current_lang, CURRENT_LANG);
+	
 	strcpyDef(www_username, WWW_USERNAME);
 	strcpyDef(www_password, WWW_PASSWORD);
 	setDef(www_basicauth_enabled, WWW_BASICAUTH_ENABLED);
@@ -618,6 +621,7 @@ void readConfig() {
 #define strcpyFromJSON(key) if (json.containsKey(#key)) strcpy(key, json[#key]);
 					strcpyFromJSON(wlanssid);
 					strcpyFromJSON(wlanpwd);
+					strcpyFromJSON(current_lang);
 					strcpyFromJSON(www_username);
 					strcpyFromJSON(www_password);
 					setFromJSON(www_basicauth_enabled);
@@ -677,6 +681,7 @@ void writeConfig() {
 	copyToJSON(SOFTWARE_VERSION);
 	copyToJSON(wlanssid);
 	copyToJSON(wlanpwd);
+	copyToJSON(current_lang);
 	copyToJSON(www_username);
 	copyToJSON(www_password);
 	copyToJSON(www_basicauth_enabled);
@@ -783,21 +788,36 @@ String form_submit(const String& value) {
 	return s;
 }
 
-String intl(const String& patt, const String& value) {
+String form_select_lang() {
+	String s = F("<tr><td colspan='2'>&nbsp;</td></tr><tr><td>{t}</td><td><select name='current_lang'><option value='DE' {s_DE}>German</option><option value='BG' {s_BG}>Bulgarian</option></select></td></tr>");
+	
+	s.replace("{t}",FPSTR(INTL_SPRACHE));
+	if(String(current_lang) == "DE"){
+		s.replace("{s_DE}","selected");
+		s.replace("{s_BG}","");
+	}else if(String(current_lang) == "BG"){
+		s.replace("{s_DE}","");
+		s.replace("{s_BG}","selected");
+	}
+	return s;
+}
+
+String tmpl(const String& patt, const String& value) {
 	String s = F("{patt}");
 	s.replace("{patt}",value);s.replace("{v}",value);
 	return s;
 }
 
-String intl(const String& patt, const String& value1, const String& value2) {
+String tmpl(const String& patt, const String& value1, const String& value2) {
 	String s = F("{patt}");
 	s.replace("{patt}",patt);s.replace("{v1}",value1),s.replace("{v2}",value2);
 	return s;
 }
 
 String line_from_value(const String& name, const String& value) {
-	String s = F("<br>{patt}");
-	s.replace("{patt}",value);s.replace("{v}",value);
+	String s = F("<br>{n}: {v}");
+	s.replace("{n}",name);
+	s.replace("{v}",value);
 	return s;
 }
 
@@ -834,7 +854,7 @@ void webserver_request_auth() {
 /* Webserver root: show all options                              *
 /*****************************************************************/
 void webserver_root() {
-	if (0 && WiFi.status() != WL_CONNECTED) {
+	if (WiFi.status() != WL_CONNECTED) {
 		server.sendHeader(F("Location"),F("http://192.168.4.1/config"));
 		server.send(302,FPSTR(TXT_CONTENT_TYPE_TEXT_HTML),"");
 	} else {
@@ -919,15 +939,18 @@ void webserver_config() {
 		page_content += form_password(F("wlanpwd"),F("Passwort"),wlanpwd,64);	
 		page_content += form_submit(FPSTR(INTL_SPEICHERN));
 		page_content += FPSTR("</table><br/><br/><br/><b>");
+		
 		page_content += FPSTR(INTL_AB_HIER_NUR_ANDERN);
 		page_content += F("</b><br/><br/><b>");
 		page_content += FPSTR(INTL_BASICAUTH);		
 		page_content += F("</b><br/>");
 		page_content += F("<table>");
-		page_content += form_input(F("www_username"),F("User"),www_username,64);
-		page_content += form_password(F("www_password"),F("Passwort"),www_password,64);
+		page_content += form_input(F("www_username"),FPSTR(INTL_BENUTZER),www_username,64);
+		page_content += form_password(F("www_password"),FPSTR(INTL_PASSWORT),www_password,64);
 		page_content += form_checkbox(F("www_basicauth_enabled"),FPSTR(INTL_BASICAUTH),www_basicauth_enabled);
+		page_content += form_select_lang();
 		page_content += form_submit(FPSTR(INTL_SPEICHERN));
+
 		page_content += F("</table><br/><br/><br/><b>APIs</b><br/>");
 		page_content += form_checkbox(F("send2dusti"),F("API Luftdaten.info"),send2dusti);
 		page_content += form_checkbox(F("send2madavi"),F("API Madavi.de"),send2madavi);
@@ -946,7 +969,7 @@ void webserver_config() {
 		page_content += F("<table>");
 		page_content += form_input(F("debug"),FPSTR(INTL_DEBUG_LEVEL),String(debug),5);	
 		page_content += F("</table><br/><b>Weitere APIs</b><br/><br/>");
-		page_content += form_checkbox(F("send2sensemap"),intl(FPSTR(INTL_SENDEN_AN),"OpenSenseMap"),send2sensemap);
+		page_content += form_checkbox(F("send2sensemap"),tmpl(FPSTR(INTL_SENDEN_AN),"OpenSenseMap"),send2sensemap);
 		page_content += F("<table>");
 		page_content += form_input(F("senseboxid"),F("senseBox-ID: "),senseboxid,50);
 		page_content += F("</table><br/>");	
@@ -958,7 +981,7 @@ void webserver_config() {
 		page_content += form_input(F("user_custom"),FPSTR(INTL_BENUTZER),user_custom,50);		
 		page_content += form_input(F("pwd_custom"),FPSTR(INTL_PASSWORT),pwd_custom,50);
 		page_content += F("</table><br/>");	
-		page_content += form_checkbox(F("send2influxdb"),intl(FPSTR(INTL_SENDEN_AN),"InfluxDB"),send2influxdb);
+		page_content += form_checkbox(F("send2influxdb"),tmpl(FPSTR(INTL_SENDEN_AN),"InfluxDB"),send2influxdb);
 		page_content += F("<table>");
 		page_content += form_input(F("host_influxdb"),FPSTR(INTL_SERVER),host_influxdb,50);
 		page_content += form_input(F("url_influxdb"),FPSTR(INTL_PFAD),url_influxdb,50);
@@ -966,7 +989,7 @@ void webserver_config() {
 		page_content += form_input(F("user_influxdb"),FPSTR(INTL_BENUTZER),user_influxdb,50);
 		page_content += form_input(F("pwd_influxdb"),FPSTR(INTL_PASSWORT),pwd_influxdb,50);
 		page_content += form_submit(FPSTR(INTL_SPEICHERN));
-		page_content += F("</table>");
+		page_content += F("</table><br/>");
 		page_content += F("<br/></form>");
 	} else {
 
@@ -978,6 +1001,7 @@ void webserver_config() {
 			readCharParam(wlanssid);
 			readCharParam(wlanpwd);
 		}
+		readCharParam(current_lang);
 		readCharParam(www_username);
 		readCharParam(www_password);
 		readBoolParam(www_basicauth_enabled);
@@ -1016,18 +1040,18 @@ void webserver_config() {
 
 		config_needs_write = true;
 
-		page_content += line_from_value(intl(FPSTR(INTL_SENDEN_AN),"Luftdaten.info"),String(send2dusti));
-		page_content += line_from_value(intl(FPSTR(INTL_SENDEN_AN),"Madavi"),String(send2madavi));
-		page_content += line_from_value(intl(FPSTR(INTL_LESE),"DHT"),String(dht_read));
-		page_content += line_from_value(intl(FPSTR(INTL_LESE),"SDS"),String(sds_read));
-		page_content += line_from_value(intl(FPSTR(INTL_LESE),"PPD"),String(ppd_read));
-		page_content += line_from_value(intl(FPSTR(INTL_LESE),"BMP180"),String(bmp_read));
-		page_content += line_from_value(intl(FPSTR(INTL_LESE),"BME280"),String(bme280_read));
-		page_content += line_from_value(intl(FPSTR(INTL_LESE),"GPS"),String(gps_read));
+		page_content += line_from_value(tmpl(FPSTR(INTL_SENDEN_AN),"Luftdaten.info"),String(send2dusti));
+		page_content += line_from_value(tmpl(FPSTR(INTL_SENDEN_AN),"Madavi"),String(send2madavi));
+		page_content += line_from_value(tmpl(FPSTR(INTL_LESE),"DHT"),String(dht_read));
+		page_content += line_from_value(tmpl(FPSTR(INTL_LESE),"SDS"),String(sds_read));
+		page_content += line_from_value(tmpl(FPSTR(INTL_LESE),"PPD"),String(ppd_read));
+		page_content += line_from_value(tmpl(FPSTR(INTL_LESE),"BMP180"),String(bmp_read));
+		page_content += line_from_value(tmpl(FPSTR(INTL_LESE),"BME280"),String(bme280_read));
+		page_content += line_from_value(tmpl(FPSTR(INTL_LESE),"GPS"),String(gps_read));
 		page_content += line_from_value(FPSTR(INTL_AUTO_UPDATE),String(auto_update));
 		page_content += line_from_value(FPSTR(INTL_DISPLAY),String(has_display));
 		page_content += line_from_value(FPSTR(INTL_DEBUG_LEVEL),String(debug));
-		page_content += line_from_value(intl(FPSTR(INTL_SENDEN_AN),"opensensemap"),String(send2sensemap));
+		page_content += line_from_value(tmpl(FPSTR(INTL_SENDEN_AN),"opensensemap"),String(send2sensemap));
 		page_content += F("<br/>senseBox-ID "); page_content += senseboxid;
 		//page_content += ine_from_value(FPSTR(Debug Level,String(debug);
 		page_content += F("<br/><br/>Eigene API "); page_content += String(send2custom);
@@ -1113,12 +1137,12 @@ void webserver_debug_level() {
 	
 	if (server.hasArg("level")) {
 		switch (server.arg("level").toInt()) {
-			case (0): debug=0; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_NONE));break;
-			case (1): debug=1; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_ERROR));break;
-			case (2): debug=2; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_WARNING));break;
-			case (3): debug=3; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MIN_INFO));break;
-			case (4): debug=4; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MED_INFO));break;
-			case (5): debug=5; page_content += intl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MAX_INFO));break;
+			case (0): debug=0; page_content += tmpl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_NONE));break;
+			case (1): debug=1; page_content += tmpl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_ERROR));break;
+			case (2): debug=2; page_content += tmpl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_WARNING));break;
+			case (3): debug=3; page_content += tmpl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MIN_INFO));break;
+			case (4): debug=4; page_content += tmpl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MED_INFO));break;
+			case (5): debug=5; page_content += tmpl("<h3>{v1} {v2}.</h3>",FPSTR(INTL_SETZE_DEBUG_AUF),FPSTR(INTL_MAX_INFO));break;
 		}
 	}
 	page_content += make_footer();
@@ -1147,12 +1171,12 @@ void webserver_removeConfig() {
 		if (SPIFFS.exists("/config.json")) {	//file exists
 			debug_out(F("removing config.json..."),DEBUG_MIN_INFO,1);
 			if (SPIFFS.remove("/config.json")) {
-				page_content += intl("<h3>{v}.</h3>",FPSTR(INTL_CONFIG_GELOSCHT));
+				page_content += tmpl("<h3>{v}.</h3>",FPSTR(INTL_CONFIG_GELOSCHT));
 			} else {
-				page_content += intl("<h3>{v}.</h3>",FPSTR(INTL_CONFIG_KONNTE_NICHT_GELOSCHT_WERDEN));
+				page_content += tmpl("<h3>{v}.</h3>",FPSTR(INTL_CONFIG_KONNTE_NICHT_GELOSCHT_WERDEN));
 			}
 		} else {
-			page_content += intl("<h3>{v}}.</h3>",FPSTR(INTL_CONFIG_NICHT_GEFUNDEN));
+			page_content += tmpl("<h3>{v}}.</h3>",FPSTR(INTL_CONFIG_NICHT_GEFUNDEN));
 		}
 #endif
 	}
@@ -1969,10 +1993,14 @@ void autoUpdate() {
 		debug_out(F("Starting OTA update ..."),DEBUG_MIN_INFO,1);
 		debug_out(F("NodeMCU firmware : "),DEBUG_MIN_INFO,0);
 		debug_out(String(SOFTWARE_VERSION),DEBUG_MIN_INFO,1);
+		debug_out(String(update_host),DEBUG_MIN_INFO,1);
+		debug_out(String(update_url),DEBUG_MIN_INFO,1);
+		
 		if (sds_read) { SDS_version = SDS_version_date();}
+		//SDS_version = "999";
 		display_debug(F("Looking for OTA update"));
 		last_update_attempt = millis();
-		t_httpUpdate_return ret = ESPhttpUpdate.update(update_host, update_port, update_url, String(SOFTWARE_VERSION)+String(" ")+esp_chipid+String(" ")+SDS_version);
+		t_httpUpdate_return ret = ESPhttpUpdate.update(update_host, update_port, update_url, String(SOFTWARE_VERSION)+String(" ")+esp_chipid+String(" ")+SDS_version+String(" ")+String(current_lang));
 		switch(ret) {
 			case HTTP_UPDATE_FAILED:
 					debug_out(F("[update] Update failed."),DEBUG_ERROR,1);
@@ -2078,15 +2106,18 @@ void setup() {
 	display_debug(F("Writing config to SPIFFS"));
 	writeConfig();
 	autoUpdate();
-
+debug_out("1",DEBUG_MIN_INFO,1);
 	create_basic_auth_strings();
-
+debug_out("2",DEBUG_MIN_INFO,1);
 	serialSDS.begin(9600);
 	serialGPS.begin(9600);
-
+debug_out("3a",DEBUG_MIN_INFO,1);
 	pinMode(PPD_PIN_PM1,INPUT_PULLUP);	// Listen at the designated PIN
+debug_out("3b",DEBUG_MIN_INFO,1);
 	pinMode(PPD_PIN_PM2,INPUT_PULLUP);	// Listen at the designated PIN
-	dht.begin();						// Start DHT
+	debug_out("3c",DEBUG_MIN_INFO,1);
+	dht.begin();
+	debug_out("4",DEBUG_MIN_INFO,1);						// Start DHT
 	delay(10);
 #if defined(ESP8266)
   debug_out("\nChipId: ",DEBUG_MIN_INFO,0);

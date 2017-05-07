@@ -2,9 +2,10 @@ const char INTL_LANG[]="BG";
 const char INTL_FEINSTAUBSENSOR[] PROGMEM = "Сензор за прахови частици";
 const char INTL_KONFIGURATION[] PROGMEM = "Конфигурация";
 const char INTL_WLAN_DATEN[] PROGMEM = "Настройки за WiFi";
+const char INTL_SPRACHE[] PROGMEM = "Език";
 const char INTL_KEINE_NETZWERKE[] PROGMEM =  "Няма намерени мрежи";
 const char INTL_NETZWERKE_GEFUNDEN[] PROGMEM = "Намерени мрежи: ";
-const char INTL_AB_HIER_NUR_ANDERN[] PROGMEM = "От тук надолу не променяй, освен ако наистина знаете какво правите";
+const char INTL_AB_HIER_NUR_ANDERN[] PROGMEM = "Разширени настройки (само ако знаете какво правите)";
 const char INTL_SPEICHERN[] PROGMEM = "Запиши";
 const char INTL_SENSOREN[] PROGMEM = "Сензори";
 const char INTL_BASICAUTH[] PROGMEM = "Оторизация";
@@ -50,3 +51,4 @@ const char INTL_MAX_INFO[] PROGMEM = "пълна информация";
 const char INTL_CONFIG_GELOSCHT[] PROGMEM = "Конфигурацията е изтрита";
 const char INTL_CONFIG_KONNTE_NICHT_GELOSCHT_WERDEN[] PROGMEM = "Конфигурацията не може да бъде изтрита";
 const char INTL_CONFIG_NICHT_GEFUNDEN[] PROGMEM = "Конфигурацията не е открита";
+
