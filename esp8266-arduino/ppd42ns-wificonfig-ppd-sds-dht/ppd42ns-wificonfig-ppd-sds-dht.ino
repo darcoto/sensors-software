@@ -58,7 +58,7 @@
 /*                                                               *
 /*****************************************************************/
 // increment on change
-#define SOFTWARE_VERSION "NRZ-2017-079"
+#define SOFTWARE_VERSION "NRZ-2017-078"
 
 /*****************************************************************
 /* Includes                                                      *
@@ -157,8 +157,7 @@ char user_custom[100] = "";
 char pwd_custom[100] = "";
 String basic_auth_custom = "";
 
-//const char* update_host = "www.madavi.de";
-const char* update_host = "192.168.25.18";
+const char* update_host = "www.madavi.de";
 const char* update_url = "/sensor/update/firmware.php";
 const int update_port = 80;
 
