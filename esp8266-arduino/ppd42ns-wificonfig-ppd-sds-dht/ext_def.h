@@ -129,7 +129,6 @@
 #define D10 10
 #define D11 11
 #define D12 12
-
 // LoRa module
 #define RFM69_CS 8
 #define RFM69_RST 4

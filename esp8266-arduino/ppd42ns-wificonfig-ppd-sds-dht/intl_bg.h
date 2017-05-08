@@ -1,4 +1,4 @@
-const char INTL_LANG[]="BG";
+const char INTL_LANG[] = "BG";
 const char INTL_FEINSTAUBSENSOR[] PROGMEM = "Сензор за прахови частици";
 const char INTL_KONFIGURATION[] PROGMEM = "Конфигурация";
 const char INTL_WLAN_DATEN[] PROGMEM = "Настройки за WiFi";
@@ -22,14 +22,11 @@ const char INTL_BENUTZER[] PROGMEM = "Потребител";
 const char INTL_PASSWORT[] PROGMEM = "Парола"; 
 const char INTL_SENDEN_AN[] PROGMEM = "Изпрати до {v}"; 
 const char INTL_LESE[] PROGMEM = "Получено от";
-
 const char INTL_GERAT_NEU_STARTEN[] PROGMEM = "Рестартирайте устройството";
-
 const char INTL_CONFIG_LOSCHEN[] PROGMEM = "Изтриване на Конфигурацията";
 const char INTL_SENSOR_NEU_STARTEN[] PROGMEM = "Рестартиране на сензора";
 const char INTL_UBERSICHT[] PROGMEM = "Начало";
 const char INTL_ZURUCK_ZUR_STARTSEITE[] PROGMEM = "Обратно към начало";
-
 const char INTL_AKTUELLE_WERTE[] PROGMEM = "Текущи данни";
 const char INTL_KARTE_DER_AKTIVEN_SENSOREN[] PROGMEM = "Карта на активните сензори (външен линк)";
 const char INTL_KONFIGURATION_LOSCHEN[] PROGMEM = "Изтриване на Конфигурацията";
@@ -38,7 +35,6 @@ const char INTL_LOSCHEN[] PROGMEM = "Изтрий";
 const char INTL_ABBRECHEN[] PROGMEM = "Отказ";
 const char INTL_SENSOR_WIRKLICH_NEU_STARTEN[] PROGMEM = "Наистина ли искате да рестартирате сензора?";
 const char INTL_NEU_STARTEN[] PROGMEM = "Рестарт";
-
 const char INTL_FIRMWARE[] PROGMEM = "Софтуер версия";
 const char INTL_SETZE_DEBUG_AUF[] PROGMEM = "Настройки дебъгването на";
 const char INTL_NONE[] PROGMEM = "изключено";
@@ -47,18 +43,15 @@ const char INTL_WARNING[] PROGMEM = "предупреждения";
 const char INTL_MIN_INFO[] PROGMEM = "минимална информация";
 const char INTL_MED_INFO[] PROGMEM = "средна информация";
 const char INTL_MAX_INFO[] PROGMEM = "пълна информация";
-
 const char INTL_CONFIG_GELOSCHT[] PROGMEM = "Конфигурацията е изтрита";
 const char INTL_CONFIG_KONNTE_NICHT_GELOSCHT_WERDEN[] PROGMEM = "Конфигурацията не може да бъде изтрита";
 const char INTL_CONFIG_NICHT_GEFUNDEN[] PROGMEM = "Конфигурацията не е открита";
-
 const char INTL_PARTIKEL_LITER[] PROGMEM = "частици/литър";
 const char INTL_TEMPERATUR[] PROGMEM = "Температура";
 const char INTL_LUFTFEUCHTE[] PROGMEM = "Влажност на въздуха";
 const char INTL_LUFTDRUCK[] PROGMEM = "Атмосферно налягане";
 const char INTL_SIGNAL[] PROGMEM = "Сила на сигнала";
 const char INTL_QUALITAT[] PROGMEM = "Качество на сигнала";
-
 const char INTL_SENSOR[] PROGMEM = "Сензор";
 const char INTL_PARAMETER[] PROGMEM = "Параметър";
 const char INTL_WERT[] PROGMEM = "Стойност";

@@ -63,7 +63,6 @@
 /*****************************************************************
 /* Includes                                                      *
 /*****************************************************************/
-
 #if defined(ESP8266)
 #include <FS.h>                     // must be first
 #include <ESP8266WiFi.h>
@@ -547,7 +546,6 @@ void copyExtDef() {
 	strcpyDef(wlanssid, WLANSSID);
 	strcpyDef(wlanpwd, WLANPWD);
 	strcpyDef(current_lang, CURRENT_LANG);
-	
 	strcpyDef(www_username, WWW_USERNAME);
 	strcpyDef(www_password, WWW_PASSWORD);
 	setDef(www_basicauth_enabled, WWW_BASICAUTH_ENABLED);
@@ -2138,7 +2136,7 @@ void setup() {
 	serialGPS.begin(9600);
 	pinMode(PPD_PIN_PM1,INPUT_PULLUP);	// Listen at the designated PIN
 	pinMode(PPD_PIN_PM2,INPUT_PULLUP);	// Listen at the designated PIN
-	dht.begin();
+	dht.begin();	// Start DHT
 	delay(10);
 #if defined(ESP8266)
   debug_out("\nChipId: ",DEBUG_MIN_INFO,0);
